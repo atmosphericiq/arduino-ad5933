@@ -446,6 +446,56 @@ bool AD5933::getComplexData(int *real, int *imag) {
 }
 
 /**
+ * Computes the impedance for a single point using the gain factor
+ *
+ * @param gain Gain factor
+ * @param real Real data
+ * @param imag Imaginary data.
+ * @return Computed impedance value
+ */
+double AD5933::computeImpedance(double gain, int real, int imag) {
+    double magnitude = sqrt(pow(real, 2) + pow(imag, 2));
+    if (gain == 0 || magnitude == 0) {
+        return INFINITY;
+    }
+    return (double) (1.0 / gain * magnitude);
+}
+
+/**
+ * Computes the impedance for a single point
+ *
+ * @param real Real data
+ * @param imag Imaginary data.
+ * @return Computed impedance value
+ */
+double AD5933::computeImpedance(int real, int imag) {
+    return computeImpedance(1., real, imag);
+}
+
+/**
+ * Computes the phase for a single point using system phase
+ *
+ * @param phase System phase
+ * @param real Real data
+ * @param imag Imaginary data.
+ * @return Computed phase value in radians
+ */
+double AD5933::computePhase(double phase, int real, int imag) {
+    return atan2(imag, real) - phase;
+}
+
+/**
+ * Computes the phase for a single point
+ *
+ * @param real Real data
+ * @param imag Imaginary data.
+ * @return Computed phase value in radians
+ */
+double AD5933::computePhase(int real, int imag) {
+    return computePhase(0, real, imag);
+}
+
+/**
  * Set the power level of the AD5933.
  *
  * @param level The power level to choose. Can be on, standby, or down.

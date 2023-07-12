@@ -129,6 +129,10 @@ class AD5933 {
 
         // Impedance data
         static bool getComplexData(int*, int*);
+        static double computeImpedance(double gain, int real, int imag);
+        static double computeImpedance(int real, int imag);
+        static double computePhase(double phase, int real, int imag);
+        static double computePhase(int real, int imag);
 
         // Set control mode register (CTRL_REG1)
         static bool setControlMode(byte);
