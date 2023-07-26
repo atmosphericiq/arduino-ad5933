@@ -91,7 +91,7 @@
 #define STATUS_SWEEP_DONE       (0x04)
 #define STATUS_ERROR            (0xFF)
 // Frequency sweep parameters
-#define SWEEP_DELAY             (1)
+#define SWEEP_DELAY             (50)
 
 /**
  * AD5933 Library class

@@ -526,13 +526,16 @@ bool AD5933::setPowerMode(byte level) {
 bool AD5933::frequencySweep(int real[], int imag[], int n) {
     // Begin by issuing a sequence of commands
     // If the commands aren't taking hold, add a brief delay
-    if (!(setPowerMode(POWER_STANDBY) &&         // place in standby
-         setControlMode(CTRL_INIT_START_FREQ) && // init start freq
-         setControlMode(CTRL_START_FREQ_SWEEP))) // begin frequency sweep
-         {
-             return false;
-         }
+    if (!(setPowerMode(POWER_STANDBY) &&          // place in standby
+         setControlMode(CTRL_INIT_START_FREQ))) { // init start freq
+        return false;
+    }
+    delay(SWEEP_DELAY); // wait for settling time to elapse
 
+    // Begin frequency sweep
+    if (!setControlMode(CTRL_START_FREQ_SWEEP)) {
+        return false;
+    }
     // Perform the sweep. Make sure we don't exceed n.
     int i = 0;
     while ((readStatusRegister() & STATUS_SWEEP_DONE) != STATUS_SWEEP_DONE) {
