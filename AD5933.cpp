@@ -561,7 +561,25 @@ bool AD5933::frequencySweep(int real[], int imag[], int n) {
 
         // Make sure we aren't exceeding the bounds of our buffer
         if (i >= n) {
+#if SWEEP_FLUSH_DUMMY == 0
             return false;
+#elif SWEEP_FLUSH_DUMMY == 1
+            // Instead of returning on overflow keep fetching dummy data until timeout occurs
+            // After that external code needs to reinit AD5933 and restart measurements
+            // This way it's possible to fix issue where STATUS_SWEEP_DONE never becomes set
+            int real_dummy, imag_dummy;
+
+            // Get the data for this frequency point and store it in the dummy
+            if (!getComplexData(&real_dummy, &imag_dummy)) {
+                return false;
+            }
+
+            // Increment the frequency and our index.
+            i++;
+            setControlMode(CTRL_INCREMENT_FREQ);
+
+            continue;
+#endif
         }
 
         // Get the data for this frequency point and store it in the array

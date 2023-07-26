@@ -92,6 +92,7 @@
 #define STATUS_ERROR            (0xFF)
 // Frequency sweep parameters
 #define SWEEP_DELAY             (50)
+#define SWEEP_FLUSH_DUMMY       (1)
 #define TIMEOUT_STATUS_TEMP     (100)
 #define TIMEOUT_STATUS_DATA     (1000)
 #define TIMEOUT_STATUS_SWEEP    (10000)
