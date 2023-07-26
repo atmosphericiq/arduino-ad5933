@@ -155,7 +155,7 @@ double AD5933::getTemperature() {
             }
         }
     }
-    return -1;
+    return NAN;
 }
 
 
