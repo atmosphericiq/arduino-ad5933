@@ -133,7 +133,13 @@ double AD5933::getTemperature() {
     // Set temperature mode
     if (enableTemperature(TEMP_MEASURE)) {
         // Wait for a valid temperature to be ready
-        while((readStatusRegister() & STATUS_TEMP_VALID) != STATUS_TEMP_VALID) ;
+        uint32_t start = millis();
+        while ((readStatusRegister() & STATUS_TEMP_VALID) != STATUS_TEMP_VALID) {
+            // Check timeout
+            if (millis() - start > TIMEOUT_STATUS_TEMP) {
+                return NAN;
+            }
+        }
 
         // Read raw temperature from temperature registers
         byte rawTemp[2];
@@ -148,7 +154,7 @@ double AD5933::getTemperature() {
             // Convert into celcius using the formula given in the
             // datasheet. There is a different formula depending on the sign
             // bit, which is the 5th bit of the byte in TEMP_DATA_1.
-            if ((rawTemp[0] & (1<<5)) == 0) {
+            if ((rawTemp[0] & (1 << 5)) == 0) {
                 return rawTempVal / 32.0;
             } else {
                 return (rawTempVal - 16384) / 32.0;
@@ -421,7 +427,15 @@ int AD5933::readControlRegister() {
  */
 bool AD5933::getComplexData(int *real, int *imag) {
     // Wait for a measurement to be available
-    while ((readStatusRegister() & STATUS_DATA_VALID) != STATUS_DATA_VALID);
+    uint32_t start = millis();
+    while ((readStatusRegister() & STATUS_DATA_VALID) != STATUS_DATA_VALID) {
+        // Check timeout
+        if (millis() - start > TIMEOUT_STATUS_DATA) {
+            *real = -1;
+            *imag = -1;
+            return false;
+        }
+    }
 
     // Read the four data registers.
     // TODO: Do this faster with a block read
@@ -537,8 +551,14 @@ bool AD5933::frequencySweep(int real[], int imag[], int n) {
         return false;
     }
     // Perform the sweep. Make sure we don't exceed n.
+    uint32_t start = millis();
     int i = 0;
     while ((readStatusRegister() & STATUS_SWEEP_DONE) != STATUS_SWEEP_DONE) {
+        // Check timeout
+        if (millis() - start > TIMEOUT_STATUS_SWEEP) {
+            return false;
+        }
+
         // Make sure we aren't exceeding the bounds of our buffer
         if (i >= n) {
             return false;
