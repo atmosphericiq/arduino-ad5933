@@ -472,7 +472,7 @@ double AD5933::computeImpedance(double gain, int real, int imag) {
     if (gain == 0 || magnitude == 0) {
         return INFINITY;
     }
-    return (double) (1.0 / gain * magnitude);
+    return (double) (1.0 / (gain * magnitude));
 }
 
 /**
